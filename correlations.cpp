@@ -184,6 +184,7 @@ void correlations()
                 double correlation = histo2->GetCorrelationFactor();
                 
 		cout << var1 << " vs " << var2 << ": " << correlation << endl;
+        delete histo2;
         	}
         
       }  
