@@ -14,7 +14,7 @@ using namespace std;
 void correlations()
 {
     auto myTree = new TChain("Hlt2DetachedJpsiTuple/Tuple");
-    myTree->Add("/Users/javiervelillaserna/Desktop/TFG/codigo.cpp/Lb2_JpsiLambda_vtx.root");
+    myTree->Add("/home/javeser/Desktop/TFM/Lb2_JpsiLambda_vtx.root");
 
     std::vector<TString> names;
     std::vector<TString> filtered_names;
@@ -27,10 +27,6 @@ void correlations()
     for (auto i : myTree->GetListOfBranches()[0]) {
         names.push_back(i->GetName());
     }
-    cout << "Se desean representar todas las variables físicas (no MOTHER o TRUE) o las variables seleccionadas? (todas->1/selected->0)" << endl;
-    cin >> selec_var;
-
-    
 
     
     if(selec_var == true){
@@ -120,6 +116,7 @@ void correlations()
             if (hist_count % max_plots_per_page == 0 || hist_count == (filtered_names.size() * (filtered_names.size() - 1) / 2)) {
                 c1->Print(("correlations_page_" + to_string(page_count) + ".pdf").c_str());
             }
+            
         }
     } cout << "Se han realizado los cortes correctamente" << endl;
     }
@@ -167,8 +164,28 @@ void correlations()
             }
         }
         } cout << "No se han realizado los cortes, como se estableció" << endl;
+        
     }
 
-   
+	cout << "Lista de varaibles con sus correlaciones:" << endl;
+
+    	for (int i = 0; i < filtered_names.size(); ++i) {
+        auto var1 = filtered_names[i];
+
+        	for (int j = i + 1; j < filtered_names.size(); ++j) {
+           	 auto var2 = filtered_names[j];
+
+            	auto histo2 = new TH2F((var1 + "_vs_" + var2).Data(), (var1 + " vs " + var2).Data(), 100, myTree->GetMinimum(var1), myTree->GetMaximum(var1), 100, myTree->GetMinimum(var2), myTree->GetMaximum(var2));
+            	myTree->Project((var1 + "_vs_" + var2).Data(), TString::Format("%s:%s", var2.Data(), var1.Data()));
+            	histo2->GetXaxis()->SetTitle(var1);
+            	histo2->GetYaxis()->SetTitle(var2);
+
+            	// Agrega el índice de correlación en la esquina superior izquierda del histograma
+                double correlation = histo2->GetCorrelationFactor();
+                
+		cout << var1 << " vs " << var2 << ": " << correlation << endl;
+        	}
+        
+      }  
 }
 
