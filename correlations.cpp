@@ -14,7 +14,7 @@ using namespace std;
 void correlations()
 {
     auto myTree = new TChain("Hlt2DetachedJpsiTuple/Tuple");
-    myTree->Add("/home/javeser/Desktop/TFM/Lb2_JpsiLambda_vtx.root");
+    myTree->Add("/Users/javiervelillaserna/Desktop/TFG/codigo.cpp/Lb2_JpsiLambda_vtx.root");
 
     std::vector<TString> names;
     std::vector<TString> filtered_names;
@@ -167,26 +167,34 @@ void correlations()
         
     }
 
-	cout << "Lista de varaibles con sus correlaciones:" << endl;
+    cout << "Lista de varaibles con sus correlaciones:" << endl;
 
-    	for (int i = 0; i < filtered_names.size(); ++i) {
+        for (int i = 0; i < filtered_names.size(); ++i) {
         auto var1 = filtered_names[i];
 
-        	for (int j = i + 1; j < filtered_names.size(); ++j) {
-           	 auto var2 = filtered_names[j];
+            for (int j = i + 1; j < filtered_names.size(); ++j) {
+                auto var2 = filtered_names[j];
+                
+                TString histo_name = var1 + "_vs_" + var2;
+                        TH2F *existing_histo = (TH2F*)gROOT->FindObject(histo_name);
 
-            	auto histo2 = new TH2F((var1 + "_vs_" + var2).Data(), (var1 + " vs " + var2).Data(), 100, myTree->GetMinimum(var1), myTree->GetMaximum(var1), 100, myTree->GetMinimum(var2), myTree->GetMaximum(var2));
-            	myTree->Project((var1 + "_vs_" + var2).Data(), TString::Format("%s:%s", var2.Data(), var1.Data()));
-            	histo2->GetXaxis()->SetTitle(var1);
-            	histo2->GetYaxis()->SetTitle(var2);
 
-            	// Agrega el índice de correlación en la esquina superior izquierda del histograma
+                        if(existing_histo) {
+                            // Si el histograma ya existe, elimínalo antes de crear uno nuevo
+                            delete existing_histo;
+                        }
+
+                auto histo2 = new TH2F((var1 + "_vs_" + var2).Data(), (var1 + " vs " + var2).Data(), 100, myTree->GetMinimum(var1), myTree->GetMaximum(var1), 100, myTree->GetMinimum(var2), myTree->GetMaximum(var2));
+                myTree->Project((var1 + "_vs_" + var2).Data(), TString::Format("%s:%s", var2.Data(), var1.Data()));
+                histo2->GetXaxis()->SetTitle(var1);
+                histo2->GetYaxis()->SetTitle(var2);
+
+                // Agrega el índice de correlación en la esquina superior izquierda del histograma
                 double correlation = histo2->GetCorrelationFactor();
                 
-		cout << var1 << " vs " << var2 << ": " << correlation << endl;
-        delete histo2;
-        	}
+                cout << var1 << " vs " << var2 << ": " << correlation << endl;
+                
+            }
         
-      }  
+      }
 }
-
