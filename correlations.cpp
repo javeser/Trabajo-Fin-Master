@@ -7,6 +7,7 @@
 #include <TCanvas.h>
 #include <TROOT.h>
 #include <TColor.h>
+#include <fstream>
 
 
 using namespace std;
@@ -15,6 +16,8 @@ void correlations()
 {
     auto myTree = new TChain("Hlt2DetachedJpsiTuple/Tuple");
     myTree->Add("/Users/javiervelillaserna/Desktop/TFG/codigo.cpp/Lb2_JpsiLambda_vtx.root");
+    
+    //"/home/javeser/Desktop/TFM/Lb2_JpsiLambda_vtx.root"
 
     std::vector<TString> names;
     std::vector<TString> filtered_names;
@@ -168,9 +171,13 @@ void correlations()
     }
 
     cout << "Lista de varaibles con sus correlaciones:" << endl;
-
+    
+    ofstream outputFile("correlations.txt");
+    
+    if (outputFile.is_open()) {
+        // Escribe las variables junto con sus correlaciones en el archivo
         for (int i = 0; i < filtered_names.size(); ++i) {
-        auto var1 = filtered_names[i];
+            auto var1 = filtered_names[i];
 
             for (int j = i + 1; j < filtered_names.size(); ++j) {
                 auto var2 = filtered_names[j];
@@ -189,12 +196,22 @@ void correlations()
                 histo2->GetXaxis()->SetTitle(var1);
                 histo2->GetYaxis()->SetTitle(var2);
 
-                // Agrega el índice de correlación en la esquina superior izquierda del histograma
+                // Calcula la correlación
                 double correlation = histo2->GetCorrelationFactor();
-                
+
+                // Escribe la variable y su correlación en el archivo
+                outputFile << var1 << " vs " << var2 << ": " << correlation << endl;
                 cout << var1 << " vs " << var2 << ": " << correlation << endl;
-                
+
+                delete histo2;
+                histo2 = nullptr;
             }
-        
-      }
+        }
+        // Cierra el archivo después de terminar de escribir
+        outputFile.close();
+        cout << "Las variables junto con sus correlaciones se han guardado en correlations.txt" << endl;
+    } else {
+        // Si no se puede abrir el archivo, muestra un mensaje de error
+        cout << "Error: No se pudo abrir el archivo correlations.txt para escribir." << endl;
+    }
 }
