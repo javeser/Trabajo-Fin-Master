@@ -6,12 +6,14 @@ lib_path = os.path.abspath('/l/javeser/farvertexing/build/libFarVertexing.so')
 lib = ctypes.CDLL(lib_path)
 
 lib.FarRKTrkTransport_new.restype = ctypes.POINTER(ctypes.c_char)
+lib.FarRKTrkTransport_new.argtypes = [ctypes.POINTER(ctypes.c_char), ctypes.c_bool]
 lib.FarRKTrkTransport_propagate_python.argtypes = [lib.FarRKTrkTransport_new.restype] + [ctypes.c_double for i in range (1,10)] + [ctypes.POINTER(ctypes.c_double) for i in range (1,4)]
 
-class FarRKTrkTransport(object):    
-    def __init__(self):
+class FarRKTrkTransport:
+    def __init__(self, MagUp: bool = False):
         # should probably update the path to match your own
-        self.obj = lib.FarRKTrkTransport_new(b'/l/javeser/farvertexing/db/MagneticFieldMapping20x20x100.root')
+        self.obj = lib.FarRKTrkTransport_new(b'/l/javeser/farvertexing/db/MagneticFieldMapping20x20x100.root', ctypes.c_bool(MagUp))
+        print("MagUP = ", MagUp)
         # self.obj = lib.FarRKTrkTransport_new(b'/l/izaac/farvertexing/db/MagneticFieldMapping100x100x500.root')
 
         
